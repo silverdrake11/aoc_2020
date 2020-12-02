@@ -10,23 +10,25 @@ pub fn day02() {
   let mut total2: usize = 0;
 
   for value in contents.lines() {
+
     let v: Vec<&str> = value.split(|c| c == ':' || c == ' ' || c == '-').collect();
     let min = v[0].parse::<usize>().unwrap(); // Convert to int
     let max = v[1].parse::<usize>().unwrap(); // Convert to int
-    let c = v[2].chars().nth(0).unwrap(); // Convert to char
+    let c = v[2];
     let password = v[4];
 
+    // Part 1
     let count = password.matches(c).count();
     if count >= min && count <= max {
       total+=1;
     }
 
-    let char1 = password.chars().nth(min-1).unwrap();
-    let char2 = password.chars().nth(max-1).unwrap();
-
-    if char1 == c as char || char2 == c as char {
+    // Part 2
+    let char1 = &password[min-1..min]; // Slice of size 1
+    let char2 = &password[max-1..max];
+    if char1 == c || char2 == c {
       if char1 != char2 {
-        total2+=1;
+        total2 += 1;
       }
     }
 
