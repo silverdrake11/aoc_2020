@@ -11,9 +11,9 @@ pub fn day02() {
 
   for value in contents.lines() {
     let v: Vec<&str> = value.split(|c| c == ':' || c == ' ' || c == '-').collect();
-    let min = v[0].parse::<usize>().unwrap();
-    let max = v[1].parse::<usize>().unwrap();
-    let c = v[2].chars().nth(0).unwrap();
+    let min = v[0].parse::<usize>().unwrap(); // Convert to int
+    let max = v[1].parse::<usize>().unwrap(); // Convert to int
+    let c = v[2].chars().nth(0).unwrap(); // Convert to char
     let password = v[4];
 
     let count = password.matches(c).count();
@@ -23,7 +23,6 @@ pub fn day02() {
 
     let char1 = password.chars().nth(min-1).unwrap();
     let char2 = password.chars().nth(max-1).unwrap();
-    //let c1 = c.chars().nth(0).unwrap();
 
     if char1 == c as char || char2 == c as char {
       if char1 != char2 {
