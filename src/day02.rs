@@ -24,10 +24,10 @@ pub fn day02() {
     }
 
     // Part 2
-    let char1 = &password[min-1..min]; // Slice of size 1
-    let char2 = &password[max-1..max];
-    if char1 == c || char2 == c {
-      if char1 != char2 {
+    let letter1 = &password[min-1..min]; // Slice of size 1
+    let letter2 = &password[max-1..max];
+    if letter1 == c || letter2 == c {
+      if letter1 != letter2 {
         total2 += 1;
       }
     }
