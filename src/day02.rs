@@ -6,7 +6,7 @@ pub fn day02() {
   let filename: String = "2.txt".to_string();
 
   let contents = fs::read_to_string(filename).unwrap();
-  let mut total: usize = 0;
+  let mut total1: usize = 0;
   let mut total2: usize = 0;
 
   for value in contents.lines() {
@@ -20,13 +20,16 @@ pub fn day02() {
     // Part 1
     let count = password.matches(c).count();
     if count >= min && count <= max {
-      total+=1;
+      total1 += 1;
     }
 
     // Part 2
-    let letter1 = &password[min-1..min]; // Slice of size 1
-    let letter2 = &password[max-1..max];
-    if letter1 == c || letter2 == c {
+    let cbytes = c.as_bytes()[0];
+    let pass_bytes = password.as_bytes();
+
+    let letter1 = pass_bytes[min-1];
+    let letter2 = pass_bytes[max-1];
+    if letter1 == cbytes || letter2 == cbytes {
       if letter1 != letter2 {
         total2 += 1;
       }
@@ -34,7 +37,7 @@ pub fn day02() {
 
   }
 
-  println!("Part 1) {}", total);
+  println!("Part 1) {}", total1);
   println!("Part 2) {}", total2);
 
 }
