@@ -1,56 +1,40 @@
 use std::fs;
 
 
-const TREE: u8 = 35;
+fn is_tree(point: (usize, usize), map: &Vec<Vec<char>>) -> Result<bool, String> {
+  
+  let (y, x) = point;
+  let x = x % map[0].len();
 
-struct Point {
-  y: usize,
-  x: usize
-}
-
-struct Map<'a> {
-  ylen: usize,
-  xlen: usize,
-  map: Vec<&'a [u8]>
-}
-
-impl Map<'_> {
-
-  pub fn new(ylen: usize, xlen: usize, map: Vec<&[u8]>) -> Map {
-    return Map {ylen: ylen, xlen: xlen, map: map};
+  if y >= map.len() {
+    return Err("Out of bounds!".to_string());
   }
 
-  pub fn is_tree(&self, point: Point) -> Result<bool, String> {
-    
-    let x: usize = point.x % self.xlen;
-    let y: usize = point.y;
-
-    if y >= self.ylen {
-      return Err("Out of bounds!".to_string());
-    }
-
-    if self.map[y][x] == TREE {
-      return Ok(true);
-    } else {
-      return Ok(false);
-    }
+  if map[y][x] == '#' {
+    return Ok(true);
+  } else {
+    return Ok(false);
   }
-
 }
 
-fn count_trees(slope: &Point, map: &Map) -> usize {
+
+fn count_trees(slope: (usize, usize), map: &Vec<Vec<char>>) -> usize {
 
   let mut y: usize = 0;
   let mut x: usize = 0;
+  let (dy, dx) = slope;
   let mut num_trees: usize = 0;
 
   loop {
-    match map.is_tree(Point{y:y, x:x}) {
+
+    let mut cur_point = (y, x);
+
+    match is_tree(cur_point, &map) {
 
       Ok(is_tree) => {
 
-        y += slope.y;
-        x += slope.x;
+        y += dy;
+        x += dx;
 
         if is_tree {
           num_trees += 1;
@@ -70,33 +54,21 @@ pub fn day03() {
   let filename: String = "3.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();
 
-  let mut map_bytes: Vec<&[u8]> = Vec::new();
+  let mut map: Vec<Vec<char>> = Vec::new();
   for value in text.lines() {
-    map_bytes.push(value.as_bytes());
+    map.push(value.chars().collect());
   }
 
-  let ylen = map_bytes.len();
-  let xlen = map_bytes[0].len();
-
-  let map_obj = Map::new(ylen, xlen, map_bytes);
-
-  let mut slopes: Vec<Point> = Vec::new();
-  slopes.push(Point {y: 1, x:3});
-
   // Part 1
-  println!("Part 1) {}", count_trees(&slopes[0], &map_obj));
+  println!("Part 1) {}", count_trees((1,3), &map));
 
   // Part 2
-  slopes.push(Point {y: 1, x:1});
-  slopes.push(Point {y: 1, x:5});
-  slopes.push(Point {y: 1, x:7});
-  slopes.push(Point {y: 2, x:1});
+  let slopes = [(1, 1),(1, 5),(1, 7),(2, 1),(1,3)];
   let mut tree_product = 1;
   for slope in &slopes {
-    tree_product *= count_trees(slope, &map_obj);
+    tree_product *= count_trees(*slope, &map);
   }
 
   println!("Part 2) {}", tree_product);
 
 }
-

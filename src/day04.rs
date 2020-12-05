@@ -3,23 +3,23 @@ use std::collections::HashSet;
 
 use regex::Regex;
 
-
 fn check_range(value: &str, min: i16, max: i16) -> bool {
   match value.parse::<i16>() {
-  Ok(num) => {
-    if num < min {
-      return false
-    } else if num > max {
-      return false
-    } else {
-      return true;
-    }
-  },
-  Err(_) => return false
+    Ok(num) => {
+      if num < min {
+        return false
+      } else if num > max {
+        return false
+      } else {
+        return true;
+      }
+    },
+    Err(_) => return false
   }
 }
 
-fn check_data(key: &str, value: &str) -> bool {
+fn check_data(key: &str, value: &str, hcl_re: &Regex, pid_re: &Regex) -> bool {
+
   match key {
     "byr" => check_range(value, 1920, 2002),
     "iyr" => check_range(value, 2010, 2020),
@@ -31,8 +31,8 @@ fn check_data(key: &str, value: &str) -> bool {
         check_range(&value[..value.len() - 2], 59, 76)
       } else { false } 
     },
-    "hcl" => Regex::new(r"^#[0-9a-f]{6}$").unwrap().is_match(value),
-    "pid" => Regex::new(r"^\d{9}$").unwrap().is_match(value),
+    "hcl" => hcl_re.is_match(value),
+    "pid" => pid_re.is_match(value),
     "ecl" => {
       match value {
         "amb" => true,
@@ -44,15 +44,7 @@ fn check_data(key: &str, value: &str) -> bool {
         "oth" => true,
         _ => false }
     }
-    "cid" => true,
     _ => false
-  }
-}
-
-fn fill_set(table: &mut HashSet<String>) {
-  let fields = ["byr","iyr","eyr","hgt","hcl","ecl","pid"];
-  for field in &fields {
-    table.insert(field.to_string());
   }
 }
 
@@ -63,19 +55,26 @@ pub fn day04() {
   let contents = fs::read_to_string(filename).unwrap();
 
   let mut table: HashSet<String> = HashSet::new();
-  fill_set(&mut table);
+  let fields = ["byr","iyr","eyr","hgt","hcl","ecl","pid"];
+  for field in &fields {
+    table.insert(field.to_string());
+  }
+  let hcl_re = Regex::new(r"^#[0-9a-f]{6}$").unwrap();
+  let pid_re = Regex::new(r"^\d{9}$").unwrap();
 
   let mut num_valid: usize = 0;
+  let mut num_fields: usize = 0;
 
   for line in contents.lines() {
 
     for item in line.split(" ") {
 
       if item == "" {
-        if table.len() == 0 {
+
+        if num_fields == table.len() {
           num_valid += 1;
         }
-        fill_set(&mut table);
+        num_fields = 0;
 
       } else {
 
@@ -83,13 +82,16 @@ pub fn day04() {
         let key = x[0];
         let value = x[1];
 
-        //table.remove(key); // Uncomment for Part 1
-        if check_data(key, value) {
-          table.remove(key);
+        if key == "cid" {
+          continue;
+        }
+        
+        //if table.contains(key) { // Part 1
+        if check_data(key, value, &hcl_re, &pid_re) { // Part 2
+          num_fields += 1;
         } 
       }
     }
-
   }
-      println!("{}", num_valid);
+  println!("{}", num_valid);
 }
