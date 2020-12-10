@@ -2,6 +2,13 @@ use std::fs;
 use std::collections::HashSet;
 use itertools::enumerate;
 
+#[derive(PartialEq,Clone,Copy)]
+ enum Op {
+    Jmp,
+    Nop,
+    Acc,
+    Err,
+}
 
 pub fn day08() {
 
@@ -9,16 +16,22 @@ pub fn day08() {
 
   let contents = fs::read_to_string(filename).unwrap();
 
-  let mut prog: Vec<(&str,i16)> = Vec::new();
+  let mut prog: Vec<(Op,i16)> = Vec::new();
   let mut flips: Vec<usize> = Vec::new();
 
   for (i, line) in enumerate(contents.lines()) {
     let inst: Vec<&str> = line.split_whitespace().collect();
     let arg: i16 = inst[1].parse::<i16>().unwrap();
-    if inst[0] == "jmp" || inst[0] == "nop" {
+    let op = match inst[0] {
+      "acc" => Op::Acc,
+      "jmp" => Op::Jmp,
+      "nop" => Op::Nop,
+      _ => Op::Err,
+    };
+    if op == Op::Jmp || op == Op::Nop {
       flips.push(i);
     }
-    prog.push((inst[0], arg));
+    prog.push((op, arg));
   }
 
   println!("{:?}", flips);
@@ -36,7 +49,7 @@ pub fn day08() {
         break;
       }
 
-      let mut op = prog[i as usize].0;
+      let mut op = prog[i as usize].0.clone();
       let arg = prog[i as usize].1;
       if set.contains(&i) { // Part 1
         break;
@@ -45,15 +58,15 @@ pub fn day08() {
 
       if (i as usize) == j {
         op = match op {
-          "jmp" => "nop",
-          "nop" => "jmp",
+          Op::Jmp => Op::Nop,
+          Op::Nop => Op::Jmp,
           _ => op,
         };
       }
 
       match op {
-        "acc" => acc += arg,
-        "jmp" => i += arg - 1,
+        Op::Acc => acc += arg,
+        Op::Jmp => i += arg - 1,
         _ => (),
       }
 
