@@ -2,6 +2,25 @@ use std::fs;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
+fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> Option<char> {
+  let ymax = rows.len();
+  let xmax = rows[0].len();
+  let (y,x) = point;
+  let (dy,dx) = slope;
+  if dx + (x as i32) < 0 {
+    return None;
+  }
+  if dy + (y as i32) < 0 {
+    return None;
+  }
+  let yadj = (y as i32 + dy) as usize;
+  let xadj = (x as i32 + dx) as usize;
+  if yadj >= ymax || xadj >= xmax {
+    return None;
+  }
+  return Some(rows[yadj][xadj]);
+}
+
 fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char>{
   let (y, x) = point;
 
@@ -11,27 +30,13 @@ fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
     return None
   }
 
-  let ymax = rows.len();
-  let xmax = rows[0].len();
-
   let mut occupied: usize = 0;
   let dirs = [(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)];
-  for dir in &dirs {
-    let (dy, dx) = dir;
-    if *dx < 0 && x == 0 {
-      continue;
-    }
-    if *dy < 0 && y == 0 {
-      continue;
-    }
-    let yadj = (y as i32 + dy) as usize;
-    let xadj = (x as i32 + dx) as usize;
-
-    if yadj >= ymax || xadj >= xmax {
-      continue;
-    }
-    if rows[yadj][xadj] == '#' {
-      occupied += 1;
+  for &dir in &dirs {
+    if let Some(seat_adj) = get_seat(point, dir, &rows) {
+      if seat_adj == '#' {
+        occupied += 1;
+      }
     }
   }
 
@@ -46,7 +51,7 @@ fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
   return None
 }
 
-fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char>{
+fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char> {
   let (y, x) = point;
 
   let seat = rows[y][x];
@@ -54,9 +59,6 @@ fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
   if seat == '.' {
     return None
   }
-
-  let ymax = rows.len();
-  let xmax = rows[0].len();
 
   let mut occupied: usize = 0;
   let mut dirs: HashSet<(i32,i32)> = vec![(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)].into_iter().collect();
@@ -66,35 +68,22 @@ fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
     for &dir in &dirs {
       let dy = dir.0 * r;
       let dx = dir.1 * r;
-      if dx + (x as i32) < 0 {
-        to_remove.push(dir);
-        continue;
+      if let Some(seat_adj) = get_seat(point, (dy,dx), &rows) {
+        if seat_adj == '.' {
+          continue
+        }
+        if seat_adj == '#' {
+          occupied += 1;
+          if seat == '#' {
+            if occupied >= 5 {
+              return Some('L');
+            }
+          } else { // If L
+            return None
+          }
+        }
       }
-      if dy + (y as i32) < 0 {
-        to_remove.push(dir);
-        continue;
-      }
-      let yadj = (y as i32 + dy) as usize;
-      let xadj = (x as i32 + dx) as usize;
-      if yadj >= ymax || xadj >= xmax {
-        to_remove.push(dir);
-        continue;
-      }
-      let seat_adj = rows[yadj][xadj];
-      if seat_adj == 'L' {
-        to_remove.push(dir);
-        continue;
-      }
-      if seat_adj == '#' {
-        occupied += 1;
-        to_remove.push(dir);
-      }
-      if seat == '#' && occupied >= 5 {
-        return Some('L');
-      }
-      if seat == 'L' && occupied > 0 {
-        return None;
-      }
+      to_remove.push(dir);
     }
     for el in to_remove {
       dirs.remove(&el);
@@ -127,11 +116,9 @@ pub fn day11() {
         }
       }
     }
-
     if changes.len() == 0 {
       break;
     }
-
     for (&point, &seat) in &changes {
       let (y,x) = point;
       rows[y][x] = seat;
