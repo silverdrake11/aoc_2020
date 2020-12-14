@@ -2,7 +2,7 @@ use std::fs;
 use std::collections::HashMap;
 use std::collections::HashSet;
 
-fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> Option<char> {
+fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> Option<(usize,usize)> {
   let ymax = rows.len();
   let xmax = rows[0].len();
   let (y,x) = point;
@@ -18,10 +18,10 @@ fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> 
   if yadj >= ymax || xadj >= xmax {
     return None;
   }
-  return Some(rows[yadj][xadj]);
+  return Some((yadj,xadj));
 }
 
-fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char>{
+/*fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char>{
   let (y, x) = point;
 
   let seat = rows[y][x];
@@ -49,9 +49,9 @@ fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
   }
 
   return None
-}
+}*/
 
-fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char> {
+/*fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char> {
   let (y, x) = point;
 
   let seat = rows[y][x];
@@ -94,7 +94,43 @@ fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<cha
     return Some('#')
   }
   return None
+}*/
+
+fn get_changes_part3(point: (usize, usize), rows: &Vec<Vec<char>>, neighbors: &HashMap<(usize,usize),Vec<(usize,usize)>>) -> Vec<(usize,usize)> {
+  let (y, x) = point;
+
+  let seat = rows[y][x];
+
+  let mut occupied: usize = 0;
+
+  let mut adj_seats: Vec<(usize, usize)> = Vec::new();
+
+  if seat == '.' {
+    return adj_seats
+  }
+
+  let dirs = [(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)];
+  for &dir in &dirs {
+    let mut mag: i32 = 1;
+    let mut dy = dir.0;
+    let mut dx = dir.1;
+
+    while let Some(neighbor) = get_seat(point, (dy,dx), &rows) {
+      mag += 1;
+      dy *= mag;
+      dx *= mag;
+      let (yadj,xadj) = neighbor;
+      let seat_adj = rows[yadj][xadj];
+      if seat_adj != '.' {
+        adj_seats.push(neighbor);
+        break;
+      }
+    }
+  }
+
+  return adj_seats;
 }
+
 
 pub fn day11() {
 
@@ -107,11 +143,23 @@ pub fn day11() {
     rows.push(line.chars().collect());
   }
 
-  loop {
+  let mut neighbors: HashMap<(usize,usize),Vec<(usize,usize)>> = HashMap::new();
+  for y in 0..rows.len() {
+    for x in 0..rows[0].len() {
+      let point = (y,x);
+      let neighbor = get_changes_part3((y,x), &rows, &neighbors);
+      if neighbor.len() > 0 {
+        neighbors.insert(point, neighbor);
+      }
+    }
+  }
+  println!("{:?}", neighbors);
+
+  /*loop {
     let mut changes: HashMap<(usize,usize),char> = HashMap::new();
     for y in 0..rows.len() {
       for x in 0..rows[0].len() {
-        if let Some(seat) = get_changes_part2((y,x), &rows) {
+        if let Some(seat) = get_changes_part3((y,x), &rows) {
           changes.insert((y,x),seat);
         }
       }
@@ -123,7 +171,7 @@ pub fn day11() {
       let (y,x) = point;
       rows[y][x] = seat;
     }
-  }
+  }*/
 
   let mut occupied = 0;
   for y in 0..rows.len() {

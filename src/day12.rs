@@ -1,10 +1,10 @@
 use std::fs;
 
-fn rotate(point: (i32, i32), degree: i32, hand: char) -> (i32, i32) {
+fn rotate(point: (i32, i32), degree: i32, turn: char) -> (i32, i32) {
   let rotations = degree / 90;
   let mut rotated: (i32, i32) = point;
   for _ in 0..rotations {
-    if hand == 'L' {
+    if turn == 'L' {
       rotated = (rotated.1, -rotated.0);
     } else {
       rotated = (-rotated.1, rotated.0);
@@ -16,7 +16,6 @@ fn rotate(point: (i32, i32), degree: i32, hand: char) -> (i32, i32) {
 pub fn day12() {
 
   let filename: String = "12.txt".to_string();
-
   let text = fs::read_to_string(filename).unwrap();
 
   let start = (0,0);  
@@ -38,5 +37,5 @@ pub fn day12() {
       _ => (),
     };
   }
-  println!("Part 2) {}", ship_point.0.abs() + ship_point.1.abs()); // Part 1 is in previous commit
+  println!("Part 2) {}", ship_point.0.abs() + ship_point.1.abs());
 }
