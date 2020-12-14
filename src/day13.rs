@@ -34,15 +34,10 @@ pub fn day13() {
     if bus_minutes == 0 { // Skip this as it's the 'x'
       continue
     }
-    loop {
-      if (timestamp + bus_num) % bus_minutes == 0 {
-        wait_time *= bus_minutes;
-        break;
-      }
+    while (timestamp + bus_num) % bus_minutes != 0 {
       timestamp += wait_time;
     }
+    wait_time *= bus_minutes;
   }
   println!("Part2) {}", timestamp);
-
-
 }
