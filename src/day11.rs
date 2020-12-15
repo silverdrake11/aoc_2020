@@ -22,24 +22,21 @@ fn get_seat(point: usize, slope: (i32, i32), length: usize, width: usize) -> Opt
 fn get_changes(point: usize, seats: &Vec<char>, adj_points: &Vec<usize>) -> Option<char> {
 
   let seat = seats[point];
-
   let mut occupied: usize = 0;
-  for &adj_point in adj_points {
-    let seat_adj = seats[adj_point];
-    if seat_adj == '#' {
-      occupied += 1;
-      if seat == '#' {
+
+  if seat == '#' {
+    for seat_adj in adj_points.iter().map(|&i| seats[i]) {
+      if seat_adj == '#' {
+        occupied += 1;
         if occupied >= 5 {
           return Some('L');
         }
-      } else { // If L
-        return None
       }
-    }
-  }
-
-  if seat == 'L' && occupied == 0 {
-    return Some('#')
+    }    
+  } else { // L
+    if adj_points.iter().all(|&i| seats[i] == 'L') {
+      return Some('#');
+    } 
   }
   return None
 }
