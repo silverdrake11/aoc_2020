@@ -19,7 +19,42 @@ fn get_seat(point: usize, slope: (i32, i32), length: usize, width: usize) -> Opt
   return Some(xadj + width*yadj);
 }
 
-fn get_changes(point: usize, seats: &Vec<char>, adj_points: &Vec<usize>) -> Option<char> {
+fn get_changes_part1(point: usize, width: usize, seats: &Vec<char>) -> Option<char>{
+
+  let seat = seats[point];
+
+  if seat == '.' {
+    return None
+  }
+
+  let length = seats.len() / width;
+
+  let mut occupied: usize = 0;
+  let dirs = [(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)];
+  for &dir in &dirs {
+    if let Some(seat_adj) = get_seat(point, dir, length, width){
+      if seats[seat_adj] == '#' {
+        occupied += 1;
+      }
+    }
+  }
+
+  if seat == 'L' && occupied == 0 {
+    return Some('#')
+  }
+
+  if seat == '#' && occupied >= 4 {
+    return Some('L')
+  }
+
+  return None
+}
+
+fn get_changes_part2(point: usize, seats: &Vec<char>, adj_points: &Vec<usize>) -> Option<char> {
+
+  if adj_points.len() == 0 {
+      return None
+  }
 
   let seat = seats[point];
   let mut occupied: usize = 0;
@@ -39,23 +74,6 @@ fn get_changes(point: usize, seats: &Vec<char>, adj_points: &Vec<usize>) -> Opti
     } 
   }
   return None
-}
-
-fn print(width: usize, grid: &Vec<char>, highlight: &Vec<usize>) {
-  let mut to_print: char;
-  for (i,&c) in grid.iter().enumerate() {
-    if highlight.contains(&i) {
-      to_print = 'x';
-    } else {
-      to_print = c;
-    }
-    if i % width == 0 {
-      print!("\n{}", to_print);
-    } else {
-      print!("{}", to_print);
-    }
-  }
-
 }
 
 fn get_adj_seats(seat: usize, width: usize, seats: &Vec<char>) -> Vec<usize> {
@@ -111,12 +129,12 @@ pub fn day11() {
     let mut changes: HashMap<usize,char> = HashMap::new();
     for i in 0..seats.len() {
       let adj_points = &adj_map[i];
-      if adj_points.len() == 0 {
-        continue;
-      }
-      if let Some(seat) = get_changes(i, &seats, &adj_points) {
+
+      //if let Some(seat) = get_changes_part1(i, width, &seats) { // Part 1
+      if let Some(seat) = get_changes_part2(i, &seats, &adj_points) { // Part 2
         changes.insert(i,seat);
       }
+
     }
     if changes.len() == 0 {
       break;
