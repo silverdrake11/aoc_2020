@@ -1,6 +1,6 @@
 use std::fs;
 
-pub fn day13() {
+pub fn advent() {
 
   let filename: String = "13.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();

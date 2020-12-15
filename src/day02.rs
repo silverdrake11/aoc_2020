@@ -1,7 +1,7 @@
 use std::fs;
 
 
-pub fn day02() {
+pub fn advent() {
 
   let filename: String = "2.txt".to_string();
 

@@ -10,7 +10,7 @@ use itertools::enumerate;
     Err,
 }
 
-pub fn day08() {
+pub fn advent() {
 
   let filename: String = "8.txt".to_string();
 

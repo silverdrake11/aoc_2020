@@ -24,7 +24,7 @@ fn find_sum(num: usize, window: usize, xmas: &Vec<usize>) -> Option<usize> {
   return None;
 }
 
-pub fn day09() {
+pub fn advent() {
 
   let filename: String = "9.txt".to_string();
 

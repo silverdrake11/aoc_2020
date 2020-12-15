@@ -15,7 +15,7 @@ fn recursive(key: &String, tree: &HashMap<String,HashMap<String,usize>>) -> usiz
 
 }
 
-pub fn day07() {
+pub fn advent() {
 
   let filename: String = "7.txt".to_string();
 

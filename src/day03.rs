@@ -49,7 +49,7 @@ fn count_trees(slope: (usize, usize), map: &Vec<Vec<char>>) -> usize {
 }
 
 
-pub fn day03() {
+pub fn advent() {
 
   let filename: String = "3.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();

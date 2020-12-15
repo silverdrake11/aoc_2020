@@ -2,7 +2,7 @@ use std::fs;
 use itertools::Itertools;
 
 
-pub fn day01() {
+pub fn advent() {
 
   let filename: String = "1.txt".to_string();
 

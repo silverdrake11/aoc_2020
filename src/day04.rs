@@ -48,7 +48,7 @@ fn check_data(key: &str, value: &str, hcl_re: &Regex, pid_re: &Regex) -> bool {
   }
 }
 
-pub fn day04() {
+pub fn advent() {
 
   let filename: String = "4.txt".to_string();
 

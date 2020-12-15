@@ -28,7 +28,7 @@ fn count_all_yes(group: &Vec<HashSet<char>>) -> usize { // For part 2
   return min_set.len() - to_remove.len();
 }
 
-pub fn day06() {
+pub fn advent() {
 
   let filename: String = "6.txt".to_string();
 

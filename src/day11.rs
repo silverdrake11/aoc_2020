@@ -99,7 +99,7 @@ fn get_adj_seats(seat: usize, width: usize, seats: &Vec<char>) -> Vec<usize> {
   return adj_seats;
 }
 
-pub fn day11() {
+pub fn advent() {
 
   let filename: String = "11.txt".to_string();
 

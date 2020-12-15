@@ -54,7 +54,7 @@ fn part2_write(mem_key: usize, mem_value: usize,
   } 
 }
 
-pub fn day14() {
+pub fn advent() {
 
   let filename: String = "14.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();

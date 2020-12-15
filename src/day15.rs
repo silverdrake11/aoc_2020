@@ -1,5 +1,5 @@
 
-pub fn day15() {
+pub fn advent() {
 
   let v: Vec<usize> = vec![1,0,18,10,19,6];
   let input_len = v.len();

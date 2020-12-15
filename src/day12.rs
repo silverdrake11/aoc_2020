@@ -13,7 +13,7 @@ fn rotate(point: (i32, i32), degree: i32, turn: char) -> (i32, i32) {
   return rotated
 }
 
-pub fn day12() {
+pub fn advent() {
 
   let filename: String = "12.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();

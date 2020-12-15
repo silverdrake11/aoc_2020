@@ -22,7 +22,7 @@ fn get_seat(part: &Vec<char>) -> usize {
   return row * 8 + col;
 }
 
-pub fn day05() {
+pub fn advent() {
 
   let filename: String = "5.txt".to_string();
   let text = fs::read_to_string(filename).unwrap();
