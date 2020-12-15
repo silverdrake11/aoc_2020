@@ -22,11 +22,9 @@ fn get_seat(point: usize, slope: (i32, i32), length: usize, width: usize) -> Opt
 fn get_changes_part1(point: usize, width: usize, seats: &Vec<char>) -> Option<char>{
 
   let seat = seats[point];
-
   if seat == '.' {
     return None
   }
-
   let length = seats.len() / width;
 
   let mut occupied: usize = 0;
@@ -38,15 +36,12 @@ fn get_changes_part1(point: usize, width: usize, seats: &Vec<char>) -> Option<ch
       }
     }
   }
-
   if seat == 'L' && occupied == 0 {
     return Some('#')
   }
-
   if seat == '#' && occupied >= 4 {
     return Some('L')
   }
-
   return None
 }
 
@@ -134,7 +129,6 @@ pub fn day11() {
       if let Some(seat) = get_changes_part2(i, &seats, &adj_points) { // Part 2
         changes.insert(i,seat);
       }
-
     }
     if changes.len() == 0 {
       break;
@@ -143,13 +137,6 @@ pub fn day11() {
       seats[point] = seat;
     }
   }
-
-  let mut occupied = 0;
-  for c in seats {
-    if c == '#' {
-      occupied += 1;
-    }
-  }
-
-  println!("\n{:?}", occupied);
+  let occupied = seats.iter().filter(|&n| *n == '#').count();
+  println!("{}", occupied);
 }
