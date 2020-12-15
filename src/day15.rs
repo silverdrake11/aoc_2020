@@ -10,14 +10,14 @@ pub fn day15() {
   }
   let mut last: usize = 0;
   for n in (input_len+1)..max {
-    let temp: usize = 
-      if nums_spoken[last] > 0 {
-        n - nums_spoken[last]
+    let when_spoken = nums_spoken[last];
+    nums_spoken[last] = n;
+    last = 
+      if when_spoken > 0 { // If it was spoken
+        n - when_spoken
       } else {
         0
       };
-    nums_spoken[last] = n;
-    last = temp;
   }
   println!("{}", last);
 }
