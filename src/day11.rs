@@ -1,11 +1,9 @@
 use std::fs;
 use std::collections::HashMap;
-use std::collections::HashSet;
 
-fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> Option<(usize,usize)> {
-  let ymax = rows.len();
-  let xmax = rows[0].len();
-  let (y,x) = point;
+fn get_seat(point: usize, slope: (i32, i32), length: usize, width: usize) -> Option<usize> {
+  let y = point / width;
+  let x = point % width;
   let (dy,dx) = slope;
   if dx + (x as i32) < 0 {
     return None;
@@ -15,27 +13,27 @@ fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> 
   }
   let yadj = (y as i32 + dy) as usize;
   let xadj = (x as i32 + dx) as usize;
-  if yadj >= ymax || xadj >= xmax {
+  if yadj >= length || xadj >= width {
     return None;
   }
-  return Some((yadj,xadj));
+  return Some(xadj + width*yadj);
 }
 
-/*fn get_changes_part1(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char>{
-  let (y, x) = point;
+fn get_changes(point: usize, seats: &Vec<char>, adj_points: &Vec<usize>) -> Option<char> {
 
-  let seat = rows[y][x];
-
-  if seat == '.' {
-    return None
-  }
+  let seat = seats[point];
 
   let mut occupied: usize = 0;
-  let dirs = [(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)];
-  for &dir in &dirs {
-    if let Some(seat_adj) = get_seat(point, dir, &rows) {
-      if seat_adj == '#' {
-        occupied += 1;
+  for &adj_point in adj_points {
+    let seat_adj = seats[adj_point];
+    if seat_adj == '#' {
+      occupied += 1;
+      if seat == '#' {
+        if occupied >= 5 {
+          return Some('L');
+        }
+      } else { // If L
+        return None
       }
     }
   }
@@ -43,71 +41,34 @@ fn get_seat(point: (usize, usize), slope: (i32, i32), rows: &Vec<Vec<char>>) -> 
   if seat == 'L' && occupied == 0 {
     return Some('#')
   }
-
-  if seat == '#' && occupied >= 4 {
-    return Some('L')
-  }
-
   return None
-}*/
+}
 
-/*fn get_changes_part2(point: (usize, usize), rows: &Vec<Vec<char>>) -> Option<char> {
-  let (y, x) = point;
-
-  let seat = rows[y][x];
-
-  if seat == '.' {
-    return None
-  }
-
-  let mut occupied: usize = 0;
-  let mut dirs: HashSet<(i32,i32)> = vec![(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)].into_iter().collect();
-  let mut r: i32 = 1;
-  while dirs.len() > 0 {
-    let mut to_remove: Vec<(i32,i32)> = Vec::new();
-    for &dir in &dirs {
-      let dy = dir.0 * r;
-      let dx = dir.1 * r;
-      if let Some(seat_adj) = get_seat(point, (dy,dx), &rows) {
-        if seat_adj == '.' {
-          continue
-        }
-        if seat_adj == '#' {
-          occupied += 1;
-          if seat == '#' {
-            if occupied >= 5 {
-              return Some('L');
-            }
-          } else { // If L
-            return None
-          }
-        }
-      }
-      to_remove.push(dir);
+fn print(width: usize, grid: &Vec<char>, highlight: &Vec<usize>) {
+  let mut to_print: char;
+  for (i,&c) in grid.iter().enumerate() {
+    if highlight.contains(&i) {
+      to_print = 'x';
+    } else {
+      to_print = c;
     }
-    for el in to_remove {
-      dirs.remove(&el);
+    if i % width == 0 {
+      print!("\n{}", to_print);
+    } else {
+      print!("{}", to_print);
     }
-    r += 1;
   }
-  if seat == 'L' && occupied == 0 {
-    return Some('#')
-  }
-  return None
-}*/
 
-fn get_changes_part3(point: (usize, usize), rows: &Vec<Vec<char>>, neighbors: &HashMap<(usize,usize),Vec<(usize,usize)>>) -> Vec<(usize,usize)> {
-  let (y, x) = point;
+}
 
-  let seat = rows[y][x];
+fn get_adj_seats(seat: usize, width: usize, seats: &Vec<char>) -> Vec<usize> {
 
-  let mut occupied: usize = 0;
-
-  let mut adj_seats: Vec<(usize, usize)> = Vec::new();
-
-  if seat == '.' {
+  let mut adj_seats: Vec<usize> = Vec::new();
+  if seats[seat] == '.' {
     return adj_seats
   }
+
+  let length = seats.len() / width;
 
   let dirs = [(0,1),(1,0),(1,1),(0,-1),(-1,0),(-1,-1),(-1,1),(1,-1)];
   for &dir in &dirs {
@@ -115,22 +76,18 @@ fn get_changes_part3(point: (usize, usize), rows: &Vec<Vec<char>>, neighbors: &H
     let mut dy = dir.0;
     let mut dx = dir.1;
 
-    while let Some(neighbor) = get_seat(point, (dy,dx), &rows) {
+    while let Some(adj_seat) = get_seat(seat, (dy,dx), length, width) {
       mag += 1;
-      dy *= mag;
-      dx *= mag;
-      let (yadj,xadj) = neighbor;
-      let seat_adj = rows[yadj][xadj];
-      if seat_adj != '.' {
-        adj_seats.push(neighbor);
+      dy = dir.0 * mag;
+      dx = dir.1 * mag;
+      if seats[adj_seat] != '.' {
+        adj_seats.push(adj_seat);
         break;
       }
     }
   }
-
   return adj_seats;
 }
-
 
 pub fn day11() {
 
@@ -138,49 +95,46 @@ pub fn day11() {
 
   let text = fs::read_to_string(filename).unwrap();
 
-  let mut rows: Vec<Vec<char>> = Vec::new();
+  let mut seats: Vec<char> = Vec::new();
+  let mut width = 0;
   for line in text.lines() {
-    rows.push(line.chars().collect());
-  }
-
-  let mut neighbors: HashMap<(usize,usize),Vec<(usize,usize)>> = HashMap::new();
-  for y in 0..rows.len() {
-    for x in 0..rows[0].len() {
-      let point = (y,x);
-      let neighbor = get_changes_part3((y,x), &rows, &neighbors);
-      if neighbor.len() > 0 {
-        neighbors.insert(point, neighbor);
-      }
+    width = line.len();
+    for c in line.chars() {
+      seats.push(c);
     }
   }
-  println!("{:?}", neighbors);
 
-  /*loop {
-    let mut changes: HashMap<(usize,usize),char> = HashMap::new();
-    for y in 0..rows.len() {
-      for x in 0..rows[0].len() {
-        if let Some(seat) = get_changes_part3((y,x), &rows) {
-          changes.insert((y,x),seat);
-        }
+  let mut adj_map: Vec<Vec<usize>> = Vec::new();
+  for i in 0..seats.len() {
+    let adj_seats = get_adj_seats(i, width, &seats);
+    adj_map.push(adj_seats);
+  }
+
+  loop {
+    let mut changes: HashMap<usize,char> = HashMap::new();
+    for i in 0..seats.len() {
+      let adj_points = &adj_map[i];
+      if adj_points.len() == 0 {
+        continue;
+      }
+      if let Some(seat) = get_changes(i, &seats, &adj_points) {
+        changes.insert(i,seat);
       }
     }
     if changes.len() == 0 {
       break;
     }
     for (&point, &seat) in &changes {
-      let (y,x) = point;
-      rows[y][x] = seat;
-    }
-  }*/
-
-  let mut occupied = 0;
-  for y in 0..rows.len() {
-    for x in 0..rows[0].len() {
-      if rows[y][x] == '#' {
-        occupied += 1;
-      }
+      seats[point] = seat;
     }
   }
 
-  println!("{:?}", occupied);
+  let mut occupied = 0;
+  for c in seats {
+    if c == '#' {
+      occupied += 1;
+    }
+  }
+
+  println!("\n{:?}", occupied);
 }

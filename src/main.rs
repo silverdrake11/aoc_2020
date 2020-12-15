@@ -1,13 +1,13 @@
 use std::time::Instant;
 
-mod day14;
-use day14::day14;
+mod day11;
+use day11::day11;
 
 
 fn main() {
 
   let now = Instant::now();
-  day14();
+  day11();
   println!("{:?}", now.elapsed());
 
 }
