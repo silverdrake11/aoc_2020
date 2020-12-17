@@ -1,7 +1,7 @@
 use std::time::Instant;
 
-mod day16;
-use day16::advent;
+mod day17;
+use day17::advent;
 
 
 fn main() {
