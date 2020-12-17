@@ -2,14 +2,11 @@ use std::fs;
 use std::collections::HashSet;
 use std::collections::HashMap;
 
-
 fn parse_range(range: &str) -> (usize, usize) {
   let ranges: Vec<usize> = range.split('-')
       .map(|s| s.parse::<usize>().unwrap()).collect();
   return (ranges[0], ranges[1]);
 }
-
-//fn check_ticket(fields: &Vec<usize>, invalids: &HashSet<usize>)
 
 fn check_field(field_id: usize, valid_nums: &HashSet<usize>, tickets: &Vec<Vec<usize>>) -> bool {
   for ticket_id in 0..tickets.len() {
@@ -20,8 +17,6 @@ fn check_field(field_id: usize, valid_nums: &HashSet<usize>, tickets: &Vec<Vec<u
   }
   return true;
 }
-
-
 
 pub fn advent() {
 
@@ -45,7 +40,6 @@ pub fn advent() {
     fields_map.insert(fields.len(), cur_values);
     fields.push(rule_split[0].to_string());
   }
-  println!("{:?}", fields);
 
   let mut tickets: Vec<Vec<usize>> = Vec::new();
   for ticket in splitted[2].lines() {
@@ -61,8 +55,6 @@ pub fn advent() {
 
   let my_ticket: Vec<usize> = splitted[1].lines().nth(1).unwrap().split(",")
         .map(|s| s.parse::<usize>().unwrap()).collect();
-  println!("{:?}", my_ticket);
-  println!("{:?}", fields);
 
   let num_fields = fields.len();
   let mut found: HashMap <usize, usize> = HashMap::new();
@@ -80,9 +72,6 @@ pub fn advent() {
     }
     elim_matrix.push(rules_test);
   }
-
-  println!("{:?}", elim_matrix);
-
   while found.len() < num_fields {
   for field_id in 0..num_fields {
     let mut count: usize = 0;
@@ -104,19 +93,11 @@ pub fn advent() {
     }
   }
   }
-
-  println!("{:?}", elim_matrix);
-  println!("{:?}", found);
-
   let mut answer = 1;
   for (field_id, rule_id) in found {
     let field_value = my_ticket[field_id];
-    println!("{:?} {}", fields[rule_id], field_value);
     if fields[rule_id].starts_with("departure") {
       answer *= field_value;
-      println!("{:?}", answer);
     }
   }
-  println!("{:?}", answer);
-
 }
