@@ -4,9 +4,12 @@ use std::collections::HashSet;
 
 fn get_neighbors(p: (i32,i32,i32)) -> Vec<(i32,i32,i32)> {
   let mut neighbors: Vec<(i32,i32,i32)> = Vec::new();
-  for x in &[-1,0,1] {
-    for y in &[-1,0,1] {
-      for z in &[-1,0,1] {
+  for x in -1..2 {
+    for y in -1..2 {
+      for z in -1..2 {
+        if x == 0 && y == 0 && z == 0 {
+          continue;
+        }
         neighbors.push((p.0+x,p.1+y,p.2+z));
       }
     }
